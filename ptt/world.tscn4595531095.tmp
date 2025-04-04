@@ -21,6 +21,7 @@ script/source = "extends Node2D
 var kiki_fish = preload(\"res://ptt/fish/kiki_fish.tscn\")
 
 var money = 0
+var fish_mon = 0
 
 func _ready() -> void:
 	randomize()
@@ -32,7 +33,7 @@ func _ready() -> void:
 	
 
 func _process(delta: float) -> void:
-	$money_label.text = \"Money: \" + str(money)
+	$money_label.text = \"Money: \" + str(fish_mon)
 
 
 func spawn_fish(danger:=false):
@@ -67,7 +68,7 @@ func _process(delta: float) -> void:
 		drag_radius = to_plr * 0.8
 	else:
 		drag_radius = 0
-	#print(get_parent().get_node(\"player\").catching)
+	print(get_parent().get_node(\"player\").catching)
 "
 
 [sub_resource type="GDScript" id="GDScript_moc86"]
@@ -100,7 +101,7 @@ func _ready() -> void:
 	
 	rand_drag_t()
 	
-	catch.connect(on_catch)
+	catch.connect(func(): on_catch)
 
 func on_catch():
 	catching = true
@@ -137,39 +138,10 @@ func _physics_process(delta: float) -> void:
 			
 			move_and_slide()
 	else:
-		#when touch threshold
-		global_position = Vector2.ZERO.direction_to(global_position) * dis
-		if dis < get_parent().get_node(\"fish_mark\").drag_radius:
-			catching = false
-			global_position = Vector2(-12,-20)
-		
-		#each state
-		if fish_dragging: #fish is dragging
-			modulate = Color.RED
-			
-			if Input.is_action_pressed(\"space\"):
-				dis += 5 * delta
-			else:
-				dis += 35 * delta
-			
-			fish_drag -= delta
-			
-			if fish_drag < 0:
-				fish_dragging = false
-				rand_drag_t()
+		if fish_dragging:
+			pass
 		else:
-			modulate = Color.WHITE
-			
-			if Input.is_action_just_pressed(\"space\"):
-				dis -= 175 * delta
-			
-			dis += 2 * delta
-			
-			fish_flow -= delta
-			
-			if fish_flow < 0:
-				fish_dragging = true
-				rand_drag_t()
+			pass
 
 func rand_drag_t():
 	fish_drag = randf_range(0.5,1)

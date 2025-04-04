@@ -9,65 +9,34 @@ script/source = "extends Node2D
 
 #KIKI fish
 #y: 100 - 422
-#price: 1 - 5
 
 #DANGERFISH
-#y: 400 - 700
-#price 10-20
-
-#6 pixel longer fish radius per 1 money unit
-#start with 270 pixel
-
-var kiki_fish = preload(\"res://ptt/fish/kiki_fish.tscn\")
+#y: 422 - 700
 
 var money = 0
-
-func _ready() -> void:
-	randomize()
-	
-	
-	#spawn kiki
-	for i in range(randi_range(10,30)):
-		spawn_fish(false)
-	
+var fish_mon = 0
 
 func _process(delta: float) -> void:
-	$money_label.text = \"Money: \" + str(money)
+	$money_label.text = \"Money: \" + str(fish_mon)
 
-
-func spawn_fish(danger:=false):
+func spawn_fish(danger := false):
 	if danger:
 		pass
 	else:
-		var fish_ins = kiki_fish.instantiate()
-		
-		get_tree().current_scene.add_child(fish_ins)
+		pass
 "
 
 [sub_resource type="GDScript" id="GDScript_2yuhq"]
 resource_name = "fishrod_mark"
 script/source = "extends Marker2D
 
-var fish_radius = 270
-var drag_radius = 0
-
-var to_plr = 0
+var fish_radius = 300
 
 func _ready() -> void:
 	queue_redraw()
 
 func _draw() -> void:
 	draw_circle(Vector2.ZERO,fish_radius,Color.YELLOW,false)
-	draw_circle(Vector2.ZERO,drag_radius,Color.HOT_PINK - Color(0,0,0,0.7),false)
-
-func _process(delta: float) -> void:
-	queue_redraw()
-	fish_radius = 270 + (get_parent().money * 6)
-	if get_parent().get_node(\"player\").catching:
-		drag_radius = to_plr * 0.8
-	else:
-		drag_radius = 0
-	#print(get_parent().get_node(\"player\").catching)
 "
 
 [sub_resource type="GDScript" id="GDScript_moc86"]
@@ -83,28 +52,8 @@ const GRV = 5
 const J_FORCE = 100
 const WATER_GRV = 0.5
 
-var fish_dragging = false
-
-signal catch
-
-var catching = false
-
-var fish_drag = 0
-var fish_flow = 0 #when fish not dragging
-
-var dis = 0
-
 func _ready() -> void:
-	randomize()
 	speed = SPD
-	
-	rand_drag_t()
-	
-	catch.connect(on_catch)
-
-func on_catch():
-	catching = true
-	dis = Vector2.ZERO.distance_to(global_position)
 
 func _process(delta: float) -> void:
 	input.x = Input.get_axis(\"left\", \"right\")
@@ -113,67 +62,29 @@ func _process(delta: float) -> void:
 	input = input.normalized()
 
 func _physics_process(delta: float) -> void:
-	if !catching:
-		if global_position.y > 5:
-			speed = SPD
-			
-			if Input.is_action_just_pressed(\"m2\"):
-				speed = DSH
-			
-			velocity = lerp(velocity, input * speed, ACC)
-			
-			velocity.y += WATER_GRV
-			
-			move_and_slide()
-			
-			if global_position.distance_to(get_tree().current_scene.get_node(\"fish_mark\").global_position) > get_tree().current_scene.get_node(\"fish_mark\").fish_radius:
-				global_position = get_tree().current_scene.get_node(\"fish_mark\").fish_radius * get_tree().current_scene.get_node(\"fish_mark\").global_position.direction_to(global_position)
-		else:
-			velocity.x = lerp(velocity.x, input.x * SPD, ACC)
-			velocity.y += GRV
-			
-			if Input.is_action_just_pressed(\"space\"):
-				velocity.y = -J_FORCE
-			
-			move_and_slide()
-	else:
-		#when touch threshold
-		global_position = Vector2.ZERO.direction_to(global_position) * dis
-		if dis < get_parent().get_node(\"fish_mark\").drag_radius:
-			catching = false
-			global_position = Vector2(-12,-20)
+	
+	if global_position.y > 5:
+		speed = SPD
 		
-		#each state
-		if fish_dragging: #fish is dragging
-			modulate = Color.RED
-			
-			if Input.is_action_pressed(\"space\"):
-				dis += 5 * delta
-			else:
-				dis += 35 * delta
-			
-			fish_drag -= delta
-			
-			if fish_drag < 0:
-				fish_dragging = false
-				rand_drag_t()
-		else:
-			modulate = Color.WHITE
-			
-			if Input.is_action_just_pressed(\"space\"):
-				dis -= 175 * delta
-			
-			dis += 2 * delta
-			
-			fish_flow -= delta
-			
-			if fish_flow < 0:
-				fish_dragging = true
-				rand_drag_t()
-
-func rand_drag_t():
-	fish_drag = randf_range(0.5,1)
-	fish_flow = randf_range(0.7,1.4)
+		if Input.is_action_just_pressed(\"m2\"):
+			speed = DSH
+		
+		velocity = lerp(velocity, input * speed, ACC)
+		
+		velocity.y += WATER_GRV
+		
+		move_and_slide()
+		
+		if global_position.distance_to(get_tree().current_scene.get_node(\"fish_mark\").global_position) > get_tree().current_scene.get_node(\"fish_mark\").fish_radius:
+			global_position = get_tree().current_scene.get_node(\"fish_mark\").fish_radius * get_tree().current_scene.get_node(\"fish_mark\").global_position.direction_to(global_position)
+	else:
+		velocity.x = input.x * SPD
+		velocity.y += GRV
+		
+		if Input.is_action_just_pressed(\"space\"):
+			velocity.y = -J_FORCE
+		
+		move_and_slide()
 "
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fqclq"]
@@ -215,7 +126,6 @@ default_color = Color(0, 0.54902, 1, 1)
 script = SubResource("GDScript_2yuhq")
 
 [node name="player" type="CharacterBody2D" parent="."]
-z_index = 3
 position = Vector2(-12, -12)
 collision_mask = 2
 script = SubResource("GDScript_moc86")

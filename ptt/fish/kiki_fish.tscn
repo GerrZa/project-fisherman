@@ -4,6 +4,60 @@
 
 [sub_resource type="GDScript" id="GDScript_730ho"]
 script/source = "extends Node2D
+
+var is_catch = false
+var progress = 0
+
+var rx = 0
+var lx = 0
+
+var dir = 1
+
+var price = 0
+
+func _ready() -> void:
+	randomize()
+	rx = randf_range(0,230)
+	lx = randf_range(300,493)
+	
+	progress = snapped(randf(), 0.01)
+	
+	global_position.x = rx + ((lx-rx) * progress)
+	global_position.y = randf_range(100,422)
+	
+	price = randf_range(1,5)
+
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed(\"m1\") and $hitbox.get_overlapping_bodies().size() > 0:
+		is_catch = true
+		var plr = get_tree().current_scene.get_node(\"player\")
+		
+		get_tree().current_scene.get_node(\"player\").emit_signal(\"catch\")
+		get_tree().current_scene.get_node(\"fish_mark\").to_plr = Vector2.ZERO.distance_to(get_tree().current_scene.get_node(\"player\").global_position)
+		global_position = Vector2.ZERO.direction_to(plr.global_position) * (global_position.distance_to(Vector2.ZERO) + global_position.distance_to(plr.global_position))
+
+func _physics_process(delta: float) -> void:
+	var plr = get_tree().current_scene.get_node(\"player\")
+	if !is_catch:
+		global_position.x = rx + ((lx-rx) * progress)
+		
+		progress += 0.001 * dir
+		
+		if progress > 1:
+			dir = -1
+			progress = 1
+		elif progress < 0:
+			dir = 1
+			progress = 0
+		
+	else:
+		look_at(get_tree().current_scene.get_node(\"player\").global_position)
+		global_position = Vector2.ZERO.direction_to(plr.global_position) * (Vector2.ZERO.distance_to(plr.global_position) + 15)
+	
+	if global_position.y < 0:
+		print(get_tree().current_scene.money)
+		get_tree().current_scene.money += price
+		queue_free()
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_730ho"]
@@ -21,3 +75,4 @@ texture = ExtResource("1_730ho")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
 shape = SubResource("RectangleShape2D_730ho")
+debug_color = Color(0.988461, 0, 0.301729, 0.42)
