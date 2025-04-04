@@ -1,0 +1,206 @@
+[gd_scene load_steps=11 format=3 uid="uid://pwt55jg44448"]
+
+[ext_resource type="Texture2D" uid="uid://d3tec7qer7d8l" path="res://icon.svg" id="1_moc86"]
+
+[sub_resource type="GDScript" id="GDScript_fqclq"]
+script/source = "extends Node2D
+
+#fish x : 0 - 493
+
+#KIKI fish
+#y: 100 - 422
+
+#DANGERFISH
+#y: 422 - 700
+
+var money = 0
+var fish_mon = 0
+
+func _process(delta: float) -> void:
+	$money_label.text = \"Money: \" + str(fish_mon)
+
+func spawn_fish(danger := false):
+	if danger:
+		pass
+	else:
+"
+
+[sub_resource type="GDScript" id="GDScript_2yuhq"]
+resource_name = "fishrod_mark"
+script/source = "extends Marker2D
+
+var fish_radius = 300
+
+func _ready() -> void:
+	queue_redraw()
+
+func _draw() -> void:
+	draw_circle(Vector2.ZERO,fish_radius,Color.YELLOW,false)
+"
+
+[sub_resource type="GDScript" id="GDScript_moc86"]
+script/source = "extends CharacterBody2D
+
+var input = Vector2.ZERO
+var speed = 0
+const SPD = 60
+const DSH = 1500
+const ACC = 0.1
+const FRIC = 0.1
+const GRV = 5
+const J_FORCE = 100
+const WATER_GRV = 0.5
+
+func _ready() -> void:
+	speed = SPD
+
+func _process(delta: float) -> void:
+	input.x = Input.get_axis(\"left\", \"right\")
+	input.y = Input.get_axis(\"up\", \"down\")
+	
+	input = input.normalized()
+
+func _physics_process(delta: float) -> void:
+	
+	if global_position.y > 5:
+		speed = SPD
+		
+		if Input.is_action_just_pressed(\"m2\"):
+			speed = DSH
+		
+		velocity = lerp(velocity, input * speed, ACC)
+		
+		velocity.y += WATER_GRV
+		
+		move_and_slide()
+		
+		if global_position.distance_to(get_tree().current_scene.get_node(\"fish_mark\").global_position) > get_tree().current_scene.get_node(\"fish_mark\").fish_radius:
+			global_position = get_tree().current_scene.get_node(\"fish_mark\").fish_radius * get_tree().current_scene.get_node(\"fish_mark\").global_position.direction_to(global_position)
+	else:
+		velocity.x = input.x * SPD
+		velocity.y += GRV
+		
+		if Input.is_action_just_pressed(\"space\"):
+			velocity.y = -J_FORCE
+		
+		move_and_slide()
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fqclq"]
+radius = 5.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_moc86"]
+load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_moc86"]
+size = Vector2(136.625, 770.75)
+
+[sub_resource type="GDScript" id="GDScript_sidxj"]
+script/source = "extends Area2D
+
+func _process(delta: float) -> void:
+	if get_overlapping_bodies().size() > 0:
+		if Input.is_action_just_pressed(\"m2\"):
+			get_tree().current_scene.money += get_tree().current_scene.fish_mon
+			get_tree().current_scene.fish_mon = 0
+			
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fqclq"]
+size = Vector2(24, 12)
+
+[sub_resource type="LabelSettings" id="LabelSettings_moc86"]
+font_size = 8
+
+[node name="world" type="Node2D"]
+script = SubResource("GDScript_fqclq")
+
+[node name="water_line" type="Line2D" parent="."]
+position = Vector2(0, -8)
+points = PackedVector2Array(0, 140, 0, 11, 493, 11, 493, 226)
+width = 2.0
+default_color = Color(0, 0.54902, 1, 1)
+
+[node name="fish_mark" type="Marker2D" parent="."]
+script = SubResource("GDScript_2yuhq")
+
+[node name="player" type="CharacterBody2D" parent="."]
+position = Vector2(-12, -12)
+collision_mask = 2
+script = SubResource("GDScript_moc86")
+metadata/_edit_group_ = true
+
+[node name="Icon" type="Sprite2D" parent="player"]
+scale = Vector2(0.0625, 0.09375)
+texture = ExtResource("1_moc86")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player"]
+shape = SubResource("CircleShape2D_fqclq")
+
+[node name="Camera2D" type="Camera2D" parent="player"]
+position_smoothing_enabled = true
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+metadata/_edit_group_ = true
+metadata/_edit_lock_ = true
+
+[node name="Icon2" type="Sprite2D" parent="StaticBody2D"]
+position = Vector2(-151, 458.5)
+scale = Vector2(2.35938, 7.16406)
+texture = ExtResource("1_moc86")
+
+[node name="Icon3" type="Sprite2D" parent="StaticBody2D"]
+position = Vector2(643.5, 458.25)
+scale = Vector2(2.35156, 7.16016)
+texture = ExtResource("1_moc86")
+
+[node name="Icon4" type="Sprite2D" parent="StaticBody2D"]
+position = Vector2(245.5, 898)
+scale = Vector2(8.57031, 2.1875)
+texture = SubResource("CompressedTexture2D_moc86")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-68.3125, 385.375)
+shape = SubResource("RectangleShape2D_moc86")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(561.25, 385.25)
+shape = SubResource("RectangleShape2D_moc86")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(254, 826.125)
+rotation = -1.57079
+shape = SubResource("RectangleShape2D_moc86")
+
+[node name="Line2D" type="Line2D" parent="StaticBody2D"]
+points = PackedVector2Array(-116, 0, 0, 0, 0, 102)
+width = 2.0
+default_color = Color(0.0235294, 0, 0, 1)
+
+[node name="Line2D2" type="Line2D" parent="StaticBody2D"]
+points = PackedVector2Array(565, 0, 493, 0, 493, 104)
+width = 2.0
+default_color = Color(0.0235294, 0, 0, 1)
+
+[node name="sell_area" type="Area2D" parent="."]
+z_index = -1
+position = Vector2(-34, -6)
+script = SubResource("GDScript_sidxj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="sell_area"]
+shape = SubResource("RectangleShape2D_fqclq")
+
+[node name="Icon" type="Sprite2D" parent="sell_area"]
+modulate = Color(0.1, 0.16, 1, 1)
+scale = Vector2(0.1875, 0.09375)
+texture = ExtResource("1_moc86")
+
+[node name="money_label" type="Label" parent="."]
+offset_left = -71.0
+offset_top = -28.0
+offset_right = -31.0
+offset_bottom = -5.0
+text = "Money:"
+label_settings = SubResource("LabelSettings_moc86")

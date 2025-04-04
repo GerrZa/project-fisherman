@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4lsvteggu7xo"]
+
+[ext_resource type="Texture2D" uid="uid://d3tec7qer7d8l" path="res://icon.svg" id="1_730ho"]
+
+[sub_resource type="GDScript" id="GDScript_730ho"]
+script/source = "extends Node2D
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_730ho"]
+size = Vector2(34, 16)
+
+[node name="KikiFish" type="Node2D"]
+script = SubResource("GDScript_730ho")
+metadata/_edit_group_ = true
+
+[node name="Icon" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.109375)
+texture = ExtResource("1_730ho")
+
+[node name="hitbox" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+shape = SubResource("RectangleShape2D_730ho")
