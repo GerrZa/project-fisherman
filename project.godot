@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Project fisherman"
-run/main_scene="uid://pwt55jg44448"
+run/main_scene="uid://dellkqcc3uxlv"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,16 @@ window/size/viewport_height=180
 window/size/window_width_override=960
 window/size/window_height_override=540
 window/stretch/mode="viewport"
+
+[file_customization]
+
+folder_colors={
+"res://scr/fish/": "orange",
+"res://scr/map/": "yellow",
+"res://scr/obj/": "purple",
+"res://scr/player/": "green",
+"res://scr/util/": "blue"
+}
 
 [input]
 
@@ -60,3 +70,10 @@ m2={
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":2,"canceled":false,"pressed":false,"double_click":false,"script":null)
 ]
 }
+
+[layer_names]
+
+2d_physics/layer_1="player"
+2d_physics/layer_2="wall"
+2d_physics/layer_3="fish"
+2d_physics/layer_4="item"
