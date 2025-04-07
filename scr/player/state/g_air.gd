@@ -12,7 +12,7 @@ func start(msg:={}):
 		plr.velocity.y = -plr.J_FORCE
 
 func physics_process(dt):
-	plr.velocity.x = plr.input.x * plr.G_SPD
+	plr.velocity.x = lerp(plr.velocity.x, plr.input.x * plr.G_SPD, plr.A_XLERP)
 	plr.velocity.y += plr.G_GRV
 	
 	plr.move_and_slide()
@@ -23,6 +23,9 @@ func process(dt):
 			fsm.tran("g_walk")
 		else:
 			fsm.tran("g_idle")
+	
+	if Input.is_action_just_released("space"):
+		plr.velocity.y = max(plr.velocity.y, -plr.J_FORCE / 3)
 
 func exit(msg:={}):
 	pass

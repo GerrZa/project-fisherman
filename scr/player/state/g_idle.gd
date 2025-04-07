@@ -11,7 +11,7 @@ func start(msg:={}):
 	pass
 
 func physics_process(dt):
-	plr.velocity.x = 0
+	plr.velocity.x = lerp(plr.velocity.x, 0.0, plr.G_XLERP)
 	plr.velocity.y = plr.G_GRV
 	
 	plr.move_and_slide()

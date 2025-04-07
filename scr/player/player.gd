@@ -10,13 +10,14 @@ var w_input = Vector2.ZERO
 #Movement Variable
 const G_GRV = 10
 const G_SPD = 70
+const G_XLERP = 0.2
+const A_XLERP = 0.2 #on-air lerp
 const J_FORCE = 200
 const W_GRV = 2
-var w_lerp = 0.05
-var w_spd = 40
-var w_dash_f = 500
-var curr_dash_t = 0
-const w_dash_t = 1 #how long will dash last before speed decrease
+var w_lerp = 0.08
+const W_DEF_SPD = 75
+var w_spd = 0
+var w_dash_f = 400
 
 #Oxygen / stamina
 var ox_max = 100
@@ -38,12 +39,10 @@ func _process(delta: float) -> void:
 	input.y = Input.get_axis("up","down")
 	w_input = input.normalized()
 	
-	print(input)
-	
 	#multi state transition
-	if global_position.y > map.water_level and str($StateMachine.state.name[0]) == "g":
+	if global_position.y > map.water_level and String($StateMachine.state.name)[0] == "g":
 		$StateMachine.tran("w_idle")
-	elif global_position.y <= map.water_level and str($StateMachine.state.name[0]) == "w":
+	elif global_position.y <= map.water_level and String($StateMachine.state.name)[0] == "w":
 		if grounded:
 			if input != Vector2.ZERO:
 				$StateMachine.tran("g_walk")
@@ -54,6 +53,7 @@ func _process(delta: float) -> void:
 
 func var_setup():
 	curr_ox = ox_max
+	w_spd = W_DEF_SPD
 
 func load_data():
 	pass

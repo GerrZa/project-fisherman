@@ -14,7 +14,6 @@ func _ready() -> void:
 	state.start()
 
 func _process(delta: float) -> void:
-	print(state.name)
 	queue_redraw()
 	if plr_ready:
 		state.process(delta)
