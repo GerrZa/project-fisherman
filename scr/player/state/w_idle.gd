@@ -12,6 +12,7 @@ func start(msg:={}):
 
 func physics_process(dt):
 	plr.velocity = lerp(plr.velocity, Vector2(0, plr.W_GRV), plr.w_lerp)
+	plr.rotation = lerp(plr.rotation, 0.0, 0.1)
 	
 	plr.move_and_slide()
 

@@ -50,6 +50,16 @@ func _process(delta: float) -> void:
 				$StateMachine.tran("g_idle")
 		else:
 			$StateMachine.tran("g_air")
+	
+	#state ground action
+	if String($StateMachine.state.name)[0] == "g":
+		rotation = lerp(rotation, 0.0, 0.5)
+	
+	if input.x < 0:
+		$spr.flip_h = true
+	elif input.x > 0:
+			$spr.flip_h = false
+	
 
 func var_setup():
 	curr_ox = ox_max
